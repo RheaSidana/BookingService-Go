@@ -23,7 +23,7 @@ brew install postgresql
 
 ```
 brew services start/stop postgresql
-```# BookingService-Go
+```
 
 <h1>1. Clone the repo </h1>
 
@@ -47,6 +47,7 @@ brew install postgresql
 ```
 
 <h3>&emsp;&emsp;2. start/stop postgres service:</h3>
+
 
 ```
 brew services start/stop postgresql
