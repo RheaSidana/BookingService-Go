@@ -1,7 +1,6 @@
 package seats
 
 import (
-	"BookingService/initializer"
 	"BookingService/src/module/seatBooked"
 	"BookingService/src/module/seatPricing"
 
@@ -10,6 +9,8 @@ import (
 
 type Handler struct {
 	repository Repository
+	seatBookedRepo seatBooked.Repository
+	seatPricingRepo seatPricing.Repository
 }
 
 func (h *Handler) FindAllSeats(c *gin.Context){
@@ -20,7 +21,7 @@ func (h *Handler) FindAllSeats(c *gin.Context){
 		return
 	}
 
-	seatsBooked, err := seatBooked.InitRepository(initializer.Db).FindAll()
+	seatsBooked, err := h.seatBookedRepo.FindAll()
 	if err != nil {
 		c.JSON(500, ErrorResponse{
 			Message: "Unable to find seats. Error: " + err.Error()})
@@ -45,7 +46,7 @@ func (h *Handler) FindSeat(c *gin.Context) {
 		return
 	}
 
-	seatPrice, err := seatPricing.InitRepository(initializer.Db).Find(seat.SeatClass)
+	seatPrice, err := h.seatPricingRepo.Find(seat.SeatClass)
 	if err != nil {
 		c.JSON(500, ErrorResponse{Message: "Seat not Found. Error: " + err.Error()})
 		return
@@ -57,7 +58,7 @@ func (h *Handler) FindSeat(c *gin.Context) {
 		return
 	}
 
-	countB, err := seatBooked.InitRepository(initializer.Db).Count(seat.SeatClass)
+	countB, err := h.seatBookedRepo.Count(seat.SeatClass)
 	if err != nil {
 		c.JSON(500, ErrorResponse{Message: "Seat not Found. Error: " + err.Error()})
 		return
