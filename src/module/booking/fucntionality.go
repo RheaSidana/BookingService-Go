@@ -15,7 +15,8 @@ func calSeatBookingTotal(seats []model.SeatPrice) float64 {
 	return sum
 }
 
-func createBooking(count int64, user model.User, booking CreateBooking, total float64) model.Booking {
+func createBooking(count int64, user model.User, 
+	booking model.CreateBooking, total float64) model.Booking {
 	rows := strconv.Itoa(int(count + 1))
 	uid := strconv.Itoa(int(user.ID))
 	length := strconv.Itoa(len(booking.Seats))
@@ -38,8 +39,9 @@ func createSeatPrice(seat model.SeatBooked, seatClass string) model.SeatPrice {
 	}
 }
 
-func createBookingResp(bookingByUser model.Booking, seatsBooked []model.SeatPrice) Booking {
-	var booking Booking
+func createBookingResp(bookingByUser model.Booking, 
+	seatsBooked []model.SeatPrice) model.BookingConfirm {
+	var booking model.BookingConfirm
 	booking.BookingId = bookingByUser.BookingId
 	booking.Total = float64(bookingByUser.Total)
 	booking.Seats = seatsBooked

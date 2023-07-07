@@ -12,10 +12,10 @@ import (
 )
 
 type Repository interface {
-	FindAll(emailOrPhone string) (Bookings, error)
+	FindAll(emailOrPhone string) (model.Bookings, error)
 	FindAllBookings(user model.User) ([]model.Booking, error)
-	FindAllBookingsSeats(bookings []model.Booking) (Bookings, error)
-	Create(booking CreateBooking) (model.Booking, error)
+	FindAllBookingsSeats(bookings []model.Booking) (model.Bookings, error)
+	Create(booking model.CreateBooking) (model.Booking, error)
 	CountRows() (int64)
 	AddToDB(booking model.Booking) (model.Booking, error)
 }
@@ -42,18 +42,18 @@ func (r *repository) CountRows() (int64){
 	return count
 }
 
-func (r *repository) FindAllBookingsSeats(bookingsByUser []model.Booking) (Bookings, error){
-	var bookings Bookings
+func (r *repository) FindAllBookingsSeats(bookingsByUser []model.Booking) (model.Bookings, error){
+	var bookings model.Bookings
 	for _, bookingByUser := range bookingsByUser {
 		seats, err := seatBooked.InitRepository(r.client).FindAllByBookingId(bookingByUser)
 		if err != nil{
-			return Bookings{}, err
+			return model.Bookings{}, err
 		}
 		seatsBooked := []model.SeatPrice{}
 		for _, seat := range seats {
 			seatClass, err := SEATS.InitRepository(r.client).FindSeatClass(seat.SeatId)
 			if err != nil{
-				return Bookings{}, err
+				return model.Bookings{}, err
 			}
 			seatBooked := createSeatPrice(seat,seatClass)
 			seatsBooked = append(seatsBooked, seatBooked)
@@ -75,32 +75,32 @@ func (r *repository) FindAllBookings(user model.User) ([]model.Booking, error) {
 	return bookingsByUser,nil
 }
 
-func (r *repository) FindAll(emailOrPhone string) (Bookings, error) {
+func (r *repository) FindAll(emailOrPhone string) (model.Bookings, error) {
 	email := emailOrPhone
 	phone, _ := strconv.Atoi(emailOrPhone)
 	//find uid
 	user, err := user.InitRepository(r.client).FindViaEmailOrPhone(email, phone)
 	if err != nil{
-		return Bookings{}, err
+		return model.Bookings{}, err
 	}
 
 	//find all bookings
 	bookingsByUser,err := r.FindAllBookings(user)
 	if err != nil{
-		return Bookings{}, err
+		return model.Bookings{}, err
 	}
 
 	//find all seats of the booking
 	bookings, err := r.FindAllBookingsSeats(bookingsByUser)
 	if err != nil{
-		return Bookings{}, err
+		return model.Bookings{}, err
 	}
 
 	//return the bookings
 	return bookings, nil
 }
 
-func (r *repository) Create(booking CreateBooking) (model.Booking, error) {
+func (r *repository) Create(booking model.CreateBooking) (model.Booking, error) {
 	isAnyBooked, err := seatBooked.InitRepository(r.client).CheckBookingSeat(booking.Seats)
 	if isAnyBooked {
 		return model.Booking{}, errors.New("seat already booked" + err.Error())

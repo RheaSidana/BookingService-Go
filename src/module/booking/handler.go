@@ -1,6 +1,7 @@
 package booking
 
 import (
+	"BookingService/src/model"
 	"reflect"
 
 	"github.com/gin-gonic/gin"
@@ -11,10 +12,10 @@ type Handler struct {
 }
 
 func (h *Handler) Create(c *gin.Context){
-	var booking CreateBooking
+	var booking model.CreateBooking
 	c.BindJSON(&booking)
 
-	if reflect.DeepEqual(booking, CreateBooking{}) {
+	if reflect.DeepEqual(booking, model.CreateBooking{}) {
 		c.JSON(400, ErrorResponse{Message: "Bad Request: Unable to create booking."})
 		return
 	}
@@ -26,7 +27,7 @@ func (h *Handler) Create(c *gin.Context){
 		return
 	}
 
-	response := CreateBookingResponse{
+	response := model.CreateBookingResponse{
 		BookingId: bookingConfirm.BookingId,
 		Total: float64(bookingConfirm.Total),
 	}
